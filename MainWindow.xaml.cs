@@ -50,31 +50,39 @@ namespace BoolSolver
                         // Пытаемся решить ОПЗ с текущими значениями переменныъ
                         bool answer = RPN.Solve(variablesTable, rpn);
                         
-                        // Если ответ единица, то расширяем СКНФ и СДНФ
+                        // Если ответ единица, то расширяем СДНФ
                         if (answer)
                         {
-                            if (PCNF.Length != 0)
-                                PCNF += " & ";
                             if (PDNF.Length != 0)
                                 PDNF += " | ";
-                            PCNF += "(";
                             PDNF += "(";
                             for (int j = 0; j < variablesTable.Count; j++)
                             {
                                 var (k, v) = variablesTable.ElementAt(j);
-
-                                PCNF += !v ? $"!{k}" : $"{k}";
-                                PDNF += v ? $"!{k}" : $"{k}";
+                                
+                                PDNF += !v ? $"!{k}" : $"{k}";
                                 
                                 if (j != variablesTable.Count - 1)
-                                {
-                                    PCNF += " | ";
                                     PDNF += " & ";
-                                }
                             }
-                            
-                            PCNF += ")";
                             PDNF += ")";
+                        }
+                        // Eсли ответ ноль, то расширяем СКНФ
+                        else
+                        {
+                            if (PCNF.Length != 0)
+                                PCNF += " & ";
+                            PCNF += "(";
+                            for (int j = 0; j < variablesTable.Count; j++)
+                            {
+                                var (k, v) = variablesTable.ElementAt(j);
+
+                                PCNF += v ? $"!{k}" : $"{k}";
+
+                                if (j != variablesTable.Count - 1)
+                                    PCNF += " | ";
+                            }
+                            PCNF += ")";
                         }
                         
                         // Добавляем значение выражения в вектор функции
